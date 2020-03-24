@@ -1,0 +1,31 @@
+Przy tworzeniu nowych obiektów , zamiast przekazywać osobno parametry
+obiektów "rodziców", lepiej przekazywać referencję tych obiektów!
+
+Branch:
+
+1. Nie ma parametru growingSegment.
+    Wystarczy, że będzie funkcja, która pobiera ilość elementów segments
+2. Nowa gałąź powstaje, gdy ma urosnąć nowy segment
+
+3. Parent Pnia (gałęzi nr 0) ma nr -1
+
+4. Nie ma odtąd tablicy dzieci. informacja o posiadaniu dziecka
+    zapisana jest w obiekcie segmentu i jest odpowiedni getter
+
+5. referencje pnia wskazują na null-e! (parent branch i segment)
+
+
+Segment
+
+1. Segmenty zawierają ścieżkę do pliku dźwiękowego. Nie będzie potrzeby
+    dzielenia pliku na mniejsze. Będzie ładowany nagrany plik do
+    pamięci i będzie odwołanie do konkretnego miejsca w pliku.
+    Dzięki temu generowanie drzewa na podstawie plików w folderach
+    sprowadza się do załadowania tylko nagłówka pliku WAVE.
+    Ale co z nagrywaniem na żywo? Jak nie musieć dzielić plików
+    podczas nagrania?
+
+2. Co z liściem? Obiekt liść jest tworzony osobną funkcją,
+    wywoływaną z funkcji settera (has leave)
+
+3. Segment będzie jedyną klasą, w której będzie rysowanie.
