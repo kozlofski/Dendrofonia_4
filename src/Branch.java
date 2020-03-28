@@ -1,27 +1,39 @@
+import processing.core.PMatrix3D;
+
 import java.util.ArrayList;
 
 public class Branch {
     int branchNumber = 1;           // unique identifier
     int branchGeneration = 0;
     int parentBranch = -1;           // identifier of parent branch ...
-    int parentSegment = -1;          // ... and it's segment
+    int parentSegmentNumber = -1;          // ... and it's segment
     float length;         // in pixels
 
     boolean reachedMaxLength = false;
     boolean reachedMaxSegments = false;
+    
+    private PMatrix3D growingMatrix;
 
     Tree tree;
-    Segment parentSeg;
+    Segment parentSegment;
 
     ArrayList<Segment> segments;
 
     public Branch(Tree tree, Branch parentBranch, Segment parentSegment) {
+        this.growingMatrix = new PMatrix3D();
+
         if(parentBranch != null) {
             this.branchGeneration = parentBranch.branchGeneration + 1;
             this.parentBranch = parentBranch.branchNumber;
-            this.parentSegment = parentSegment.segmentNumber;
-            this.parentSeg = parentSegment;
+            this.parentSegmentNumber = parentSegment.segmentNumber;
+            this.parentSegment = parentSegment;
+            this.growingMatrix.set(parentSegment.getMatrix()); // fixed!
+            this.growingMatrix.rotateZ(Parameters.CHILDANGLES[branchGeneration]);
+            // FIXME: 28.03.2020 
+        } else {
+            this.growingMatrix.set(tree.rootMatrix.get());
         }
+        
         this.tree = tree;
         tree.incrementBranchesGrown();
         this.branchNumber = tree.getBranchesGrown();
@@ -42,6 +54,11 @@ public class Branch {
         else return false;
     }
 
+    public void updateGrowingMatrix(PMatrix3D endOfLastSegmentMatrix, float lastSegmentLength) {
+        this.growingMatrix.set(endOfLastSegmentMatrix);
+        this.growingMatrix.translate(lastSegmentLength, 0, 0);
+    }
+
     private void recalculateLength() {
         length += Parameters.SEGMENTLENGTH[branchGeneration];
         if(length > Parameters.MAXBRANCHLENGTH[branchGeneration])
@@ -50,7 +67,7 @@ public class Branch {
 
     private void recalculateDiameters() {
         float maxBaseDiameter = branchGeneration > 0 ?
-            this.parentSeg.getDiameter() : 200;
+            this.parentSegment.getDiameter() : 200;
 
         float baseDiameter = Math.min(maxBaseDiameter, length/Parameters.BRANCHLEANNESS[branchGeneration]);
 
@@ -72,7 +89,11 @@ public class Branch {
         else return true;
     }
 
-//    public int howManySegments() {
+    public PMatrix3D getGrowingMatrix() {
+        return growingMatrix;
+    }
+
+    //    public int howManySegments() {
 //        return segments.size();
 //    }
 
@@ -82,7 +103,7 @@ public class Branch {
         for(int i = 0; i < branchGeneration; i++)
             branchString += "  ";
         // sformatować wyświetlanie nr gałęzi FIXME
-        branchString += " |- br " + branchNumber + " from seg " + parentSegment + " gen " +
+        branchString += " |- br " + branchNumber + " from seg " + parentSegmentNumber + " gen " +
                 branchGeneration + " length " + length + " px (" +
                 segments.size() + " segments)";
         for(Segment s : segments) {
