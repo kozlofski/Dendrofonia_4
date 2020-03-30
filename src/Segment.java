@@ -1,6 +1,9 @@
 import processing.core.PApplet;
 import processing.core.PMatrix3D;
 
+import java.lang.reflect.Parameter;
+import java.util.logging.Formatter;
+
 public class Segment {
     int branchNumber;
     int branchGeneration;
@@ -9,10 +12,9 @@ public class Segment {
     int absSegmentNumber;
 
     float length;               // in pixels
-    float diameter = 1;             // in pixels
+    float diameter = 1.0f;             // in pixels
 
-    private String soundFile = "";
-    int soundFilePosition;      // in samples
+    Sound sound;
 
     boolean hasLeave;
     Leave leave;
@@ -29,12 +31,16 @@ public class Segment {
         this.absSegmentNumber = tree.getSegmentsGrown();
         this.tree = tree;
         this.currentBranch = currentBranch;
-        this.length = Parameters.SEGMENTLENGTH[branchGeneration];
+        this.length = Parameters.SEGMENTLENGTH[branchGeneration] +
+                (float) (Math.random() * Parameters.SEGMENTLENGTHRANDOMNESS[branchGeneration]);
         this.tree.incrementSegmentsGrown();
         this.matrix = new PMatrix3D();
         this.matrix.set(currentBranch.getGrowingMatrix());
-        this.matrix.rotateX((float) Math.toRadians(15.0f));
-        this.matrix.rotateZ((float) Math.toRadians(3.0f));
+        this.matrix.rotateX(((float) (2.0f * Math.PI) /
+                Parameters.PHYLLOTAXIS[branchGeneration]) /
+                Parameters.CHILDDENSITY[branchGeneration]);
+        this.matrix.rotateZ((float) Math.toRadians(Parameters.WAVINESS[branchGeneration] +
+                Math.random() * Parameters.WAVINESSRANDOMNESS[branchGeneration]));
         this.childBranch = makeChild();
         // FIXME: 28.03.2020 pofalowanie gałęzi i filotaksja tutaj
         currentBranch.updateGrowingMatrix(this.matrix, this.length);
@@ -61,31 +67,17 @@ public class Segment {
         this.diameter = diameter;
     }
 
-    public void setSoundFile(String soundFile, int soundFilePosition) {
-        this.soundFile = soundFile;
-        this.soundFilePosition = soundFilePosition;
-    }
-
-    public void setSoundFilePosition(int soundFilePosition) {
-        this.soundFilePosition = soundFilePosition;
+    public void setSound(Sound sound) {
+        this.sound = sound;
     }
 
     public void drawSegment() {
         Main.p.pushMatrix();
         Main.p.applyMatrix(this.matrix);
-//        weight = segmentDiameter''// * stokeWievModifier;
-//        //if (weight < 1.5) smooth();
-//        //else noSmooth();
         Main.p.strokeWeight(this.diameter);
-//        Main.p.strokeWeight(50);
-        Main.p.stroke(255 - absSegmentNumber, 120 + absSegmentNumber, 25 + absSegmentNumber);
-//        //stroke(50, 0, 0);//128 - 1.25 * matrix.m23);
-//        //    stroke(70);
-//
-        Main.p.line(0, 0, 0, 100, 0, 0);
-        //if (weight > 10) // dla wypełnienia szpar w najgrubszych gałęziach rysuje drugą linię, trochę przesuniętą
-//        //  line(5, 0, 0, segmentLength, 0, 0);
-//
+        Main.p.line(0, 0, 0, this.length, 0, 0);
+        if (this.diameter > 10.0f)
+            Main.p.line(this.length * 0.5f, 0, 0, this.length * 1.5f, 0, 0);
 //        if (hasLeave == true)
 //        {
 //            drawLeave();
@@ -115,17 +107,17 @@ public class Segment {
 
     @Override
     public String toString() {
-        String segmentString = "\n";
+        String segmentString = "\n  ";
         for (int i = 0; i < this.branchGeneration; i++)
-            segmentString += "  ";
+            segmentString += "  |";
 
         // sformatować wyświetlanie nr segmentu FIXME
-        segmentString += "  -seg: " + segmentNumber +
-                " from br: " + branchNumber + " length: " + length +
-                " diameter: " + diameter/* +
-                " sound: " + soundFile + " sample: " + soundFilePosition*/;
+        segmentString += "  |__ sg: " + (String.format("%5d", segmentNumber)) +
+                " length: " + String.format("%4.2f", length) +
+                " diameter: " + String.format("%4.2f", diameter)
+        /* + " sound: " + soundFile + " sample: " + soundFilePosition*/;
 
-        segmentString += " " + matrix.m00 + " " + matrix.m01 + " " + matrix.m02 + " " + matrix.m03;
+//        segmentString += " " + matrix.m00 + " " + matrix.m01 + " " + matrix.m02 + " " + matrix.m03;
 
         if (childBranch != -1)
             segmentString += tree.branches.get(childBranch).toString();

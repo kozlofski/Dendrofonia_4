@@ -1,18 +1,27 @@
 import processing.core.PApplet;
 
+import java.util.ArrayList;
+
 public class Main extends PApplet {
     public static PApplet p;
     private Tree tree = new Tree();
+    private Fog fog = new Fog(40);
+    private ArrayList<Sound> sounds;
+
+    float displayAngle = 0;
+
+    public static void main(String[] args) {
+        PApplet.main("Main", args);
+//        System.out.println("Main applet: " + Main.p);
+    }
 
     public void setup() {
         p = this;
-        frameRate(1.0f);
+        frameRate(25);
         background(0);
-        for (int i = 0; i < 300; i++)
-            if (!tree.grow()) {
-                System.err.println("  Tree generating stopped");
-                break;
-            }
+        hint(ENABLE_DEPTH_SORT);
+        colorMode(RGB, 255, 255, 255, 1.0f);
+//        tree.grow(10000);
         System.out.println(tree);
     }
 
@@ -20,35 +29,12 @@ public class Main extends PApplet {
         size(1000, 1000, "processing.opengl.PGraphics3D");
     }
 
-    public static void main(String[] args) {
-        PApplet.main("Main", args);
-//        p = this;
-        System.out.println("Main applet: " + Main.p);
-    }
-
     public void draw() {
+        tree.grow(4);
+        displayAngle += 0.03;
         background(0);
-        tree.drawTree();
-//        pushMatrix();
-//        translate(width/2, height/2, 0);
-//        fog();
-//        popMatrix();
-    }
-
-    void fog()
-    {
-        pushMatrix();
-        rectMode(CENTER);
-        noStroke();
-        //fill(255, 255, 255, 10);
-        fill(0, 0, 0, 20);
-        translate(0, 0, -100);
-        for (int z=0; z<20; z++)
-        {
-            rect(0, 50, 2*width, 2*height);
-            translate(0, 0, 10);
-        }
-        popMatrix();
+        tree.drawTree(displayAngle);
+        fog.draw();
     }
 
 }

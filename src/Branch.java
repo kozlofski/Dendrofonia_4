@@ -1,5 +1,6 @@
 import processing.core.PMatrix3D;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
 public class Branch {
@@ -7,6 +8,7 @@ public class Branch {
     int branchGeneration = 0;
     int parentBranch = -1;           // identifier of parent branch ...
     int parentSegmentNumber = -1;          // ... and it's segment
+//    int totalSegments = 0;
     float length;         // in pixels
 
     boolean reachedMaxLength = false;
@@ -28,8 +30,8 @@ public class Branch {
             this.parentSegmentNumber = parentSegment.segmentNumber;
             this.parentSegment = parentSegment;
             this.growingMatrix.set(parentSegment.getMatrix()); // fixed!
-            this.growingMatrix.rotateZ(Parameters.CHILDANGLES[branchGeneration]);
-            // FIXME: 28.03.2020 
+            this.growingMatrix.rotateZ((float) (Math.toRadians(Parameters.CHILDANGLES[branchGeneration] +
+                    Math.random() * Parameters.CHILDANGLESRANDOMNESS[branchGeneration])));
         } else {
             this.growingMatrix.set(tree.rootMatrix.get());
         }
@@ -43,10 +45,9 @@ public class Branch {
     public boolean grow() {
         if (growthPossible()) {
             segments.add(new Segment(tree, this));
+
             if(segments.size() > Parameters.MAXSEGMENTS[branchGeneration])
                 reachedMaxSegments = true;
-            // sounds.get najnowszy
-            // segments-najnowszy załaduj doń te dźwięki ;) FIXME
             recalculateLength();
             recalculateDiameters();
             return true;
@@ -54,13 +55,14 @@ public class Branch {
         else return false;
     }
 
+
     public void updateGrowingMatrix(PMatrix3D endOfLastSegmentMatrix, float lastSegmentLength) {
         this.growingMatrix.set(endOfLastSegmentMatrix);
         this.growingMatrix.translate(lastSegmentLength, 0, 0);
     }
 
     private void recalculateLength() {
-        length += Parameters.SEGMENTLENGTH[branchGeneration];
+        length += segments.get(segments.size() - 1).length;
         if(length > Parameters.MAXBRANCHLENGTH[branchGeneration])
             reachedMaxLength = true;
     }
@@ -93,22 +95,22 @@ public class Branch {
         return growingMatrix;
     }
 
-    //    public int howManySegments() {
-//        return segments.size();
-//    }
-
     @Override
     public String toString() {
-        String branchString = "\n";
+        String branchString = "\n  ";
         for(int i = 0; i < branchGeneration; i++)
-            branchString += "  ";
+            branchString += "  |";
         // sformatować wyświetlanie nr gałęzi FIXME
-        branchString += " |- br " + branchNumber + " from seg " + parentSegmentNumber + " gen " +
-                branchGeneration + " length " + length + " px (" +
-                segments.size() + " segments)";
+        branchString += "  \\__ BR: " + String.format("%5d", branchNumber) +
+                " length: " + String.format("%4.2f", length) + " (" + segments.size() + " segments)";
         for(Segment s : segments) {
             branchString += s.toString();
         }
+        branchString += "\n  ";
+        for(int i = 0; i < branchGeneration; i++)
+            branchString += "  |";
+
+
         return branchString;
     }
 

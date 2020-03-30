@@ -33,6 +33,12 @@ public class Tree {
         segmentsGrown++;
     }
 
+    public void grow(int times) {
+        for (int i = 0; i < times; i++) {
+            if(!grow()) break;
+        }
+    }
+
     public boolean grow() {
         if(growthPossible()) {
             int startBranch = currentBranch;
@@ -77,31 +83,36 @@ public class Tree {
     }
 
     private void makeRoot() {
-//        this.rootMatrix.reset();
-//        this.rootMatrix.translate(Main.p.width/2, Main.p.height, 0);
-        this.rootMatrix.translate(500, 750, 0);
-//        this.rootMatrix.rotateZ(Main.p.radians(-90));
+        this.rootMatrix.reset();
         this.rootMatrix.rotateZ(-1.57f);
         this.branches.add(new Branch(this, null, null));
-//        System.out.println(Main.p);
     }
 
-    public void drawTree() {
+    // FIXME: 30.03.2020 rename displayMatrix()
+    private PMatrix3D displayMatrix(float angle) {
+        PMatrix3D displayMatrix = new PMatrix3D();
+        displayMatrix.translate(Main.p.width * 0.5f, Main.p.width * 0.9f, 0);
+        displayMatrix.rotateY(angle);
+        return displayMatrix;
+    }
+
+    public void drawTree(float angle) {
+        Main.p.pushMatrix();
+        Main.p.applyMatrix(displayMatrix(angle));
+        Main.p.stroke(255, 255, 255, 1.0f);
         for (Branch b : branches) {
             b.drawBranch();
         }
+        Main.p.popMatrix();
     }
 
     @Override
     public String toString() {
         String treeString = "TREE:";
-        treeString += "\n segments grown: " + segmentsGrown;
         treeString += "\nROOT";
-
-//        for (Branch b : branches) {
-//            treeString += b.toString();
-//        }
         treeString += branches.get(0).toString();
+        treeString += "\n branches grown: " + branchesGrown;
+        treeString += "\n segments grown: " + segmentsGrown;
         return treeString;
     }
 }
