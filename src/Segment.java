@@ -1,18 +1,15 @@
-import processing.core.PApplet;
+//import processing.core.PApplet;
 import processing.core.PMatrix3D;
 
-import java.lang.reflect.Parameter;
-import java.util.logging.Formatter;
-
 public class Segment {
-    int branchNumber;
-    int branchGeneration;
-    int segmentNumber;
-    int childBranch = -1;       // unique id of child branch
-    int absSegmentNumber;
+    private int branchNumber;
+    private int branchGeneration;
+    private int segmentNumber;
+    private int childBranch = -1;       // unique id of child branch
+    private int absSegmentNumber;
 
-    float length;               // in pixels
-    float diameter = 1.0f;             // in pixels
+    private float length;               // in pixels
+    private float diameter = 1.0f;             // in pixels
 
     Sound sound;
 
@@ -25,8 +22,8 @@ public class Segment {
     Branch currentBranch;
 
     public Segment(Tree tree, Branch currentBranch) {
-        this.branchNumber = currentBranch.branchNumber;
-        this.branchGeneration = currentBranch.branchGeneration;
+        this.branchNumber = currentBranch.getBranchNumber();
+        this.branchGeneration = currentBranch.getBranchGeneration();
         this.segmentNumber = currentBranch.segments.size() + 1;
         this.absSegmentNumber = tree.getSegmentsGrown();
         this.tree = tree;
@@ -53,6 +50,10 @@ public class Segment {
 
     public float getDiameter() {
         return diameter;
+    }
+
+    public int getSegmentNumber() {
+        return segmentNumber;
     }
 
     public float getLength() {

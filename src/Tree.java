@@ -1,8 +1,9 @@
 import processing.core.PMatrix3D;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Tree {
+public class Tree implements Serializable {
     private int branchesGrown = -1;
     private int currentBranch = -1;
     private int segmentsGrown = -1;
@@ -21,8 +22,16 @@ public class Tree {
         return branchesGrown;
     }
 
+    public int getCurrentBranch() {
+        return currentBranch;
+    }
+
     public int getSegmentsGrown() {
         return segmentsGrown;
+    }
+
+    public PMatrix3D getRootMatrix() {
+        return rootMatrix;
     }
 
     public void incrementBranchesGrown() {
@@ -35,12 +44,12 @@ public class Tree {
 
     public void grow(int times) {
         for (int i = 0; i < times; i++) {
-            if(!grow()) break;
+            if (!grow()) break;
         }
     }
 
     public boolean grow() {
-        if(growthPossible()) {
+        if (growthPossible()) {
             int startBranch = currentBranch;
             boolean branchGrown;
             do {
@@ -49,18 +58,17 @@ public class Tree {
                 branchGrown = branches.get(currentBranch).grow();
 
             } while (!branchGrown && (currentBranch != startBranch));
-            if(branchGrown)
+            if (branchGrown)
                 return true;
             else {
                 System.err.println(" All branches full");
                 return false;
             }
-        }
-        else return false;
+        } else return false;
     }
 
     public void nextBranch() {
-        currentBranch ++;
+        currentBranch++;
         if (currentBranch > branchesGrown)
             currentBranch = 0;
     }
@@ -73,8 +81,8 @@ public class Tree {
 
     public static void main(String[] args) {
         Tree tree = new Tree();
-        for(int i = 0; i < 20; i++)
-            if(!tree.grow()) {
+        for (int i = 0; i < 20; i++)
+            if (!tree.grow()) {
                 System.err.println("  Tree generating stopped");
                 break;
             }

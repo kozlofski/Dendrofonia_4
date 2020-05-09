@@ -14,7 +14,7 @@ public class Parameters {
 
     static double[] WAVINESSRANDOMNESS =         {1.0f, 30.0f, 18.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f};
 
-    static int[] PHYLLOTAXIS =      {3, 3, 3, 3, 3, 3, 3, 3};
+    static int[] PHYLLOTAXIS =      {5, 5, 5, 3, 3, 3, 3, 3};
     static int[] CHILDDENSITY =     {3, 3, 2, 2, 2, 2, 2, 2};
     static int[] FIRSTCHILDOFFSET = {15, 5, 4, 3, 3, 2, 2, 2};
     static int[] MAXBRANCHLENGTH =  {1400, 300, 100, 50, 30, 20, 10, 10};

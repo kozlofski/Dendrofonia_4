@@ -1,18 +1,19 @@
 import processing.core.PMatrix3D;
 
+import java.io.Serializable;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
-public class Branch {
-    int branchNumber = 1;           // unique identifier
-    int branchGeneration = 0;
-    int parentBranch = -1;           // identifier of parent branch ...
-    int parentSegmentNumber = -1;          // ... and it's segment
+public class Branch implements Serializable {
+    private int branchNumber = 1;           // unique identifier
+    private int branchGeneration = 0;
+    private int parentBranch = -1;           // identifier of parent branch ...
+    private int parentSegmentNumber = -1;          // ... and it's segment
 //    int totalSegments = 0;
-    float length;         // in pixels
+    private float length;         // in pixels
 
-    boolean reachedMaxLength = false;
-    boolean reachedMaxSegments = false;
+    private boolean reachedMaxLength = false;
+    private boolean reachedMaxSegments = false;
     
     private PMatrix3D growingMatrix;
 
@@ -27,7 +28,7 @@ public class Branch {
         if(parentBranch != null) {
             this.branchGeneration = parentBranch.branchGeneration + 1;
             this.parentBranch = parentBranch.branchNumber;
-            this.parentSegmentNumber = parentSegment.segmentNumber;
+            this.parentSegmentNumber = parentSegment.getSegmentNumber();
             this.parentSegment = parentSegment;
             this.growingMatrix.set(parentSegment.getMatrix()); // fixed!
             this.growingMatrix.rotateZ((float) (Math.toRadians(Parameters.CHILDANGLES[branchGeneration] +
@@ -62,7 +63,7 @@ public class Branch {
     }
 
     private void recalculateLength() {
-        length += segments.get(segments.size() - 1).length;
+        length += segments.get(segments.size() - 1).getLength();
         if(length > Parameters.MAXBRANCHLENGTH[branchGeneration])
             reachedMaxLength = true;
     }
@@ -75,7 +76,7 @@ public class Branch {
 
         for(Segment s : segments) {
             float newDiameter;
-            newDiameter = Math.max(1.0f, (1.0f-( s.segmentNumber/(float)segments.size() ) ) * baseDiameter);       // FIXME div/0?
+            newDiameter = Math.max(1.0f, (1.0f-( s.getSegmentNumber()/(float)segments.size() ) ) * baseDiameter);       // FIXME div/0?
             s.setDiameter(newDiameter);
         }
     }
@@ -94,6 +95,40 @@ public class Branch {
     public PMatrix3D getGrowingMatrix() {
         return growingMatrix;
     }
+
+    public int getBranchNumber() {
+        return branchNumber;
+    }
+
+    public int getBranchGeneration() {
+        return branchGeneration;
+    }
+
+    public int getParentBranch() {
+        return parentBranch;
+    }
+
+    public int getParentSegmentNumber() {
+        return parentSegmentNumber;
+    }
+
+    public float getLength() {
+        return length;
+    }
+
+    public boolean isReachedMaxLength() {
+        return reachedMaxLength;
+    }
+
+    public boolean isReachedMaxSegments() {
+        return reachedMaxSegments;
+    }
+
+    public Segment getParentSegment() {
+        return parentSegment;
+    }
+
+
 
     @Override
     public String toString() {

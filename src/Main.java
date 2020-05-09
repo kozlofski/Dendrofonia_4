@@ -21,8 +21,10 @@ public class Main extends PApplet {
         background(0);
         hint(ENABLE_DEPTH_SORT);
         colorMode(RGB, 255, 255, 255, 1.0f);
-//        tree.grow(10000);
+        tree.grow(10000);
         System.out.println(tree);
+//        TreeSaver ts = new TreeSaver();
+//        ts.saveTree(tree);
     }
 
     public void settings() {
@@ -30,11 +32,12 @@ public class Main extends PApplet {
     }
 
     public void draw() {
-        tree.grow(4);
+//        tree.grow(4);
         displayAngle += 0.03;
         background(0);
         tree.drawTree(displayAngle);
         fog.draw();
     }
+
 
 }
